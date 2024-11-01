@@ -11,20 +11,19 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3  # Updated to latest version
+      uses: actions/checkout@v4  # Updated to the latest version
 
     - name: Build TUSKit
       run: |
-        xcodebuild clean -project TUSKit.xcodeproj -scheme TUSKit -configuration Release -sdk iphonesimulator -arch x86_64 build  # Added `clean` for fresh builds
+        xcodebuild clean -project TUSKit.xcodeproj -scheme TUSKit -configuration Release -sdk iphonesimulator -arch x86_64 build
 
     - name: Archive TUSKit Framework
       run: |
-        set -e  # Stop on error
         mkdir -p output
         cp -R build/Release-iphonesimulator/TUSKit.framework output/
 
     - name: Upload TUSKit Framework
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4  # Updated to the latest version
       with:
         name: TUSKit.framework
         path: output/TUSKit.framework
