@@ -29,10 +29,12 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
-      - name: Build Swift Package for iOS
-        run: |
-          swift build --configuration release --arch arm64 --arch x86_64 --triple ios
-          swift build --configuration release --arch arm64 --arch x86_64 --triple ios-simulator
+      # Separate build commands for each architecture and platform
+      - name: Build Swift Package for iOS Device (arm64)
+        run: swift build --configuration release --arch arm64 --target TUSKit
+
+      - name: Build Swift Package for iOS Simulator (x86_64)
+        run: swift build --configuration release --arch x86_64 --target TUSKit
 
       - name: Create Objective-C Wrapper
         run: |
