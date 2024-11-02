@@ -16,6 +16,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch the full history
+
+      - name: List Repository Files
+        run: ls -R  # Verify that TUSKit.xcodeproj is in the expected location
 
       - uses: swift-actions/setup-swift@v2
         with:
@@ -35,9 +40,6 @@ jobs:
           -sdk iphonesimulator \
           -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
           -derivedDataPath build
-
-      - name: List Build Directory
-        run: ls -R build  # Output directory structure after build
 
       - name: Archive Framework
         run: |
