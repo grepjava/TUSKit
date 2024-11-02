@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build Framework
+    name: Build Swift Package
     strategy:
       matrix:
         os: ["macos-latest"]
@@ -29,28 +29,16 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
-      - name: Generate Xcode Project
-        run: swift package generate-xcodeproj  # Generates TUSKit.xcodeproj from the Swift package
+      - name: Build Swift Package
+        run: swift build -c release  # Builds the Swift package in release mode
 
-      - name: List Available Schemes
-        run: xcodebuild -list -project TUSKit.xcodeproj  # Verifies the generated project and lists schemes
-
-      - name: Build Framework
-        run: |
-          xcodebuild clean build \
-          -scheme TUSKit \
-          -configuration Release \
-          -sdk iphonesimulator \
-          -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
-          -derivedDataPath build
-
-      - name: Archive Framework
+      - name: Archive Build Products
         run: |
           mkdir -p output
-          find build -name "TUSKit.framework" -exec cp -R {} output/ \;
+          cp -R .build/release/* output/
 
-      - name: Upload Framework as Artifact
+      - name: Upload Build Products as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TUSKit.framework
-          path: output/TUSKit.framework
+          name: TUSKit_Build_Products
+          path: output
