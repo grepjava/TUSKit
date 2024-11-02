@@ -1,29 +1,48 @@
-name: Build TUSKit
+name: Build
 
-on:
+on: 
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-latest
+    name: Build Framework
+    strategy:
+      matrix:
+        os: ["macos-latest"]
+        swift: ["5.10"]
+    runs-on: ${{ matrix.os }}
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4  # Updated to the latest version
+      - name: Extract Branch Name
+        run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
 
-    - name: Build TUSKit
-      run: |
-        xcodebuild clean -project TUSKit.xcodeproj -scheme TUSKit -configuration Release -sdk iphonesimulator -arch x86_64 build
+      - uses: actions/checkout@v3
 
-    - name: Archive TUSKit Framework
-      run: |
-        mkdir -p output
-        cp -R build/Release-iphonesimulator/TUSKit.framework output/
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: ${{ matrix.swift }}
+      
+      - name: Get swift version
+        run: swift --version
 
-    - name: Upload TUSKit Framework
-      uses: actions/upload-artifact@v4  # Updated to the latest version
-      with:
-        name: TUSKit.framework
-        path: output/TUSKit.framework
+      - name: Build Framework
+        run: |
+          xcodebuild clean build \
+          -scheme TUSKit \
+          -configuration Release \
+          -sdk iphonesimulator \
+          -arch x86_64 \
+          -arch arm64 \
+          -derivedDataPath build
+      
+      - name: Archive Framework
+        run: |
+          mkdir -p output
+          cp -R build/Build/Products/Release-iphonesimulator/TUSKit.framework output/
+      
+      - name: Upload Framework as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TUSKit.framework
+          path: output/TUSKit.framework
