@@ -20,17 +20,20 @@ jobs:
           fetch-depth: 0  # Fetch the full history
 
       - name: List Repository Files
-        run: ls -R  # Verify that TUSKit.xcodeproj is in the expected location
+        run: ls -R  # Lists all files and directories to confirm the project's presence
 
       - uses: swift-actions/setup-swift@v2
         with:
           swift-version: ${{ matrix.swift }}
       
-      - name: Get swift version
+      - name: Get Swift version
         run: swift --version
 
+      - name: Generate Xcode Project
+        run: swift package generate-xcodeproj  # Generates TUSKit.xcodeproj from the Swift package
+
       - name: List Available Schemes
-        run: xcodebuild -list -project TUSKit.xcodeproj
+        run: xcodebuild -list -project TUSKit.xcodeproj  # Verifies the generated project and lists schemes
 
       - name: Build Framework
         run: |
