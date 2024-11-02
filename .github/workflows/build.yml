@@ -29,12 +29,19 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
-      # Separate build commands for each architecture and platform
       - name: Build Swift Package for iOS Device (arm64)
-        run: swift build --configuration release --arch arm64 --target TUSKit
+        run: |
+          xcodebuild build \
+            -scheme TUSKit \
+            -destination "platform=iOS,name=iPhone 14,OS=latest" \
+            -configuration Release
 
       - name: Build Swift Package for iOS Simulator (x86_64)
-        run: swift build --configuration release --arch x86_64 --target TUSKit
+        run: |
+          xcodebuild build \
+            -scheme TUSKit \
+            -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
+            -configuration Release
 
       - name: Create Objective-C Wrapper
         run: |
@@ -67,6 +74,7 @@ jobs:
             -scheme TUSKit \
             -archivePath output/TUSKit-iphoneos.xcarchive \
             -sdk iphoneos \
+            -destination "platform=iOS,name=iPhone 14,OS=latest" \
             -configuration Release \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
@@ -74,6 +82,7 @@ jobs:
             -scheme TUSKit \
             -archivePath output/TUSKit-iphonesimulator.xcarchive \
             -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
             -configuration Release \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
