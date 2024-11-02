@@ -14,10 +14,8 @@ jobs:
         swift: ["5.10"]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Extract Branch Name
-        run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v3
 
       - uses: swift-actions/setup-swift@v2
         with:
@@ -25,6 +23,9 @@ jobs:
       
       - name: Get swift version
         run: swift --version
+
+      - name: List Available Schemes
+        run: xcodebuild -list -project TUSKit.xcodeproj
 
       - name: Build Framework
         run: |
@@ -34,12 +35,15 @@ jobs:
           -sdk iphonesimulator \
           -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
           -derivedDataPath build
-      
+
+      - name: List Build Directory
+        run: ls -R build  # Output directory structure after build
+
       - name: Archive Framework
         run: |
           mkdir -p output
-          cp -R build/Build/Products/Release-iphonesimulator/TUSKit.framework output/
-      
+          find build -name "TUSKit.framework" -exec cp -R {} output/ \;
+
       - name: Upload Framework as Artifact
         uses: actions/upload-artifact@v4
         with:
