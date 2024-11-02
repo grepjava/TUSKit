@@ -31,11 +31,11 @@ jobs:
 
       - name: Build for iOS Device (arm64)
         run: |
-          swift build --configuration release --arch arm64 --triple arm64-apple-ios --build-path .build/ios-arm64
+          swift build --configuration release --triple arm64-apple-ios --build-path .build/ios-arm64
           
       - name: Build for iOS Simulator (x86_64)
         run: |
-          swift build --configuration release --arch x86_64 --triple x86_64-apple-ios --build-path .build/ios-x86_64
+          swift build --configuration release --triple x86_64-apple-ios --build-path .build/ios-x86_64
 
       - name: Create Objective-C Wrapper
         run: |
