@@ -29,6 +29,14 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
+      - name: Build for iOS Device (arm64)
+        run: |
+          swift build --configuration release --arch arm64 --triple arm64-apple-ios --build-path .build/ios-arm64
+          
+      - name: Build for iOS Simulator (x86_64)
+        run: |
+          swift build --configuration release --arch x86_64 --triple x86_64-apple-ios --build-path .build/ios-x86_64
+
       - name: Create Objective-C Wrapper
         run: |
           mkdir -p Wrapper
@@ -54,10 +62,12 @@ jobs:
           @end
           EOF
 
-      - name: Build XCFramework with Swift Package Manager
+      - name: Create XCFramework
         run: |
-          swift build --configuration release
-          swift package generate-xcframework --output output/TUSKit.xcframework
+          xcodebuild -create-xcframework \
+            -framework .build/ios-arm64/Release/TUSKit.framework \
+            -framework .build/ios-x86_64/Release/TUSKit.framework \
+            -output output/TUSKit.xcframework
 
       - name: Upload XCFramework as Artifact
         uses: actions/upload-artifact@v4
