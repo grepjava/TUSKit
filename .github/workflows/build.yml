@@ -86,6 +86,15 @@ jobs:
             -configuration Release \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
+      - name: List Archive Contents (Debugging)
+        run: |
+          echo "Contents of iOS Device Archive:"
+          ls -R output/TUSKit-iphoneos.xcarchive
+          echo "Contents of iOS Simulator Archive:"
+          ls -R output/TUSKit-iphonesimulator.xcarchive
+
+      - name: Create XCFramework
+        run: |
           xcodebuild -create-xcframework \
             -framework output/TUSKit-iphoneos.xcarchive/Products/Library/Frameworks/TUSKit.framework \
             -framework output/TUSKit-iphonesimulator.xcarchive/Products/Library/Frameworks/TUSKit.framework \
