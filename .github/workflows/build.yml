@@ -29,44 +29,34 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
+      - name: Clean Build Directory
+        run: rm -rf .build
+
       - name: Build for iOS Device (arm64)
         run: |
-          swift build --configuration release --triple arm64-apple-ios --build-path .build/ios-arm64
-          
+          xcodebuild archive \
+            -scheme TUSKit \
+            -archivePath output/TUSKit-iphoneos.xcarchive \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -configuration Release \
+            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+
       - name: Build for iOS Simulator (x86_64)
         run: |
-          swift build --configuration release --triple x86_64-apple-ios --build-path .build/ios-x86_64
-
-      - name: Create Objective-C Wrapper
-        run: |
-          mkdir -p Wrapper
-          cat <<EOF > Wrapper/TUSKitWrapper.h
-          #import <Foundation/Foundation.h>
-
-          @interface TUSKitWrapper : NSObject
-          - (NSString *)exampleFunction;
-          @end
-          EOF
-
-          cat <<EOF > Wrapper/TUSKitWrapper.m
-          #import "TUSKitWrapper.h"
-          @import TUSKit;  // Import TUSKit module
-
-          @implementation TUSKitWrapper
-
-          - (NSString *)exampleFunction {
-              // Example Swift function wrapped in Objective-C
-              return [TUSKit someSwiftFunction];  // Replace with actual Swift call
-          }
-
-          @end
-          EOF
+          xcodebuild archive \
+            -scheme TUSKit \
+            -archivePath output/TUSKit-iphonesimulator.xcarchive \
+            -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" \
+            -configuration Release \
+            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
       - name: Create XCFramework
         run: |
           xcodebuild -create-xcframework \
-            -framework .build/ios-arm64/Release/TUSKit.framework \
-            -framework .build/ios-x86_64/Release/TUSKit.framework \
+            -framework output/TUSKit-iphoneos.xcarchive/Products/Library/Frameworks/TUSKit.framework \
+            -framework output/TUSKit-iphonesimulator.xcarchive/Products/Library/Frameworks/TUSKit.framework \
             -output output/TUSKit.xcframework
 
       - name: Upload XCFramework as Artifact
