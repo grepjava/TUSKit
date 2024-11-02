@@ -29,8 +29,10 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
-      - name: Generate Xcode Project
-        run: swift package generate-xcodeproj  # Generates the Xcode project from Package.swift if supported
+      - name: Build Swift Package for iOS
+        run: |
+          swift build --configuration release --arch arm64 --arch x86_64 --triple ios
+          swift build --configuration release --arch arm64 --arch x86_64 --triple ios-simulator
 
       - name: Create Objective-C Wrapper
         run: |
