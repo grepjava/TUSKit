@@ -29,20 +29,6 @@ jobs:
       - name: Get Swift version
         run: swift --version
 
-      - name: Build Swift Package for iOS Device (arm64)
-        run: |
-          xcodebuild build \
-            -scheme TUSKit \
-            -destination "platform=iOS,name=iPhone 14,OS=latest" \
-            -configuration Release
-
-      - name: Build Swift Package for iOS Simulator (x86_64)
-        run: |
-          xcodebuild build \
-            -scheme TUSKit \
-            -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
-            -configuration Release
-
       - name: Create Objective-C Wrapper
         run: |
           mkdir -p Wrapper
@@ -68,37 +54,10 @@ jobs:
           @end
           EOF
 
-      - name: Build Objective-C Wrapper as XCFramework
+      - name: Build XCFramework with Swift Package Manager
         run: |
-          xcodebuild archive \
-            -scheme TUSKit \
-            -archivePath output/TUSKit-iphoneos.xcarchive \
-            -sdk iphoneos \
-            -destination "platform=iOS,name=iPhone 14,OS=latest" \
-            -configuration Release \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-
-          xcodebuild archive \
-            -scheme TUSKit \
-            -archivePath output/TUSKit-iphonesimulator.xcarchive \
-            -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
-            -configuration Release \
-            BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-
-      - name: List Archive Contents (Debugging)
-        run: |
-          echo "Contents of iOS Device Archive:"
-          ls -R output/TUSKit-iphoneos.xcarchive
-          echo "Contents of iOS Simulator Archive:"
-          ls -R output/TUSKit-iphonesimulator.xcarchive
-
-      - name: Create XCFramework
-        run: |
-          xcodebuild -create-xcframework \
-            -framework output/TUSKit-iphoneos.xcarchive/Products/Library/Frameworks/TUSKit.framework \
-            -framework output/TUSKit-iphonesimulator.xcarchive/Products/Library/Frameworks/TUSKit.framework \
-            -output output/TUSKit.xcframework
+          swift build --configuration release
+          swift package generate-xcframework --output output/TUSKit.xcframework
 
       - name: Upload XCFramework as Artifact
         uses: actions/upload-artifact@v4
